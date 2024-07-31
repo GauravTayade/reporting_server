@@ -28,7 +28,7 @@ exports.query_endpoint_data_source_details = `SELECT E.name         AS vendor,
                                                        JOIN "EndpointMetrics" AS EM
                                                             ON CE.id = EM.ce_id
                                               WHERE CE.client_id IN ($1)
-                                                AND EM.created_at >= current_date - interval '30' day
+                                                AND EM.created_at BETWEEN $2 AND $3
                                               GROUP BY CE.id, E.id`
 
 //to get edr datasource details
@@ -43,7 +43,7 @@ exports.query_edr_data_source_details = `SELECT edr.name        AS vendor,
                                                   JOIN "EDRMetrics" AS EDRM
                                                        ON CEDR.id = EDRM.cedr_id
                                          WHERE CEDR.client_id IN ($1)
-                                           AND EDRM.created_at >= current_date - interval '30' day
+                                           AND EDRM.created_at BETWEEN $2 AND $3
                                          GROUP BY CEDR.id, edr.id`
 
 //to get nac datasource details
@@ -58,7 +58,7 @@ exports.query_nac_data_source_details = `SELECT N.name          AS vendor,
                                                   JOIN "NACMetrics" AS NACM
                                                        ON CNAC.id = NACM.cnac_id
                                          WHERE CNAC.client_id IN ($1)
-                                           AND NACM.created_at >= current_date - interval '30' day
+                                           AND NACM.created_at BETWEEN $2 AND $3
                                          GROUP BY CNAC.id, N.id`
 //get VA scan details
 exports.query_VAScan_data_source_details = `SELECT V.code    AS vendor,
@@ -72,7 +72,7 @@ exports.query_VAScan_data_source_details = `SELECT V.code    AS vendor,
                                                      JOIN "VAMetrics" AS VAM
                                                           ON CVA.id = VAM.cva_id
                                             WHERE CVA.client_id IN ($1)
-                                              AND VAM.created_at >= current_date - interval '30' DAY
+                                              AND VAM.created_at BETWEEN $2 AND $3
                                             GROUP BY CVA.id, V.id`
 
 //get the top external threats count

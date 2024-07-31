@@ -15,7 +15,7 @@ router.get("/getNACCount",async(req,res)=>{
 
 router.get("/getNACDataSourceDetails",async (req,res)=>{
   try{
-    const result = await db.query(apiQueries.query_nac_data_source_details,[req.query.customerId])
+    const result = await db.query(apiQueries.query_nac_data_source_details,[req.query.customerId,req.query.startDate, req.query.endDate])
     res.status(200).send(result.rows)
   }
   catch(error){
