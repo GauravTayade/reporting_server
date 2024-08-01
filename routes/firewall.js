@@ -4,6 +4,18 @@ const db = require('../database/db');
 const apiQueries = require("../database/apiQueries");
 const {lazyrouter} = require("express/lib/application");
 
+//test get all firewall record
+router.get('/getAllFirewallDetails', async(req, res) => {
+  try{
+    const result  = await db.query(`SELECT * FROM "FirewallMetrics" WHERE cf_id='3ea9994f-8132-407e-b1ed-691f5526ce28' AND created_at >= current_date - interval '30' day`);
+    res.status(200).send(result.rows)
+  }
+  catch (error){
+    console.log(error)
+  }
+})
+
+
 router.get("/getFirewallCount",async (req,res)=>{
   try{
     const result = await db.query(apiQueries.query_firewall_count_total,[req.query.customerId])
