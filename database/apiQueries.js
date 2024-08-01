@@ -1,5 +1,12 @@
+const db = require("./db");
 exports.query_get_customer_list = `SELECT *
                                    FROM "Client"`
+
+//test
+exports.query_test = `SELECT *
+                       FROM "FirewallMetrics"
+                       WHERE cf_id = $1
+                         AND created_at BETWEEN  $2 AND $3`
 
 //to get firewall datasource details
 exports.query_customer_firewall_data_source_details = `SELECT F.name                  AS vendor,
@@ -187,15 +194,15 @@ exports.query_endpoint_list = `SELECT *
 //                                                    GROUP BY eas.active_server
 //                                                    ORDER BY totalcount DESC LIMIT 5`
 
-exports.query_endpoint_most_active_servers_list=`SELECT EAS.active_server,
-                                                        SUM(EAS.count) as totalcount 
-                                                 FROM "EndpointAuthenticationsActiveServer" AS EAS 
-                                                     JOIN "ClientEndpoint" AS CE 
-                                                         ON EAS.ce_id=CE.id 
-                                                 WHERE CE.client_id IN ($1) 
-                                                   AND EAS.created_at BETWEEN $2 AND $3 
-                                                 GROUP BY eas.active_server 
-                                                 ORDER BY totalcount DESC LIMIT 5`
+exports.query_endpoint_most_active_servers_list = `SELECT EAS.active_server,
+                                                          SUM(EAS.count) as totalcount
+                                                   FROM "EndpointAuthenticationsActiveServer" AS EAS
+                                                            JOIN "ClientEndpoint" AS CE
+                                                                 ON EAS.ce_id = CE.id
+                                                   WHERE CE.client_id IN ($1)
+                                                     AND EAS.created_at BETWEEN $2 AND $3
+                                                   GROUP BY eas.active_server
+                                                   ORDER BY totalcount DESC LIMIT 5`
 
 exports.query_endpoint_metric = `SELECT MAX(count)    as hostCount,
                                         SUM(log)      as logCount,
@@ -227,65 +234,65 @@ exports.query_endpoint_log_ingestion_count = `SELECT SUM(log) as logCount
 //                                                  AND created_at >= current_date - interval '30' day`
 
 exports.query_endpoint_authentication_count = `SELECT SUM(auth) as totalAuthenticationCount
-                                               FROM "EndpointAuthentications" AS EA 
-                                                   JOIN "ClientEndpoint" AS CE 
-                                                       ON EA.ce_id=CE.id 
-                                               WHERE CE.client_id IN ($1) 
+                                               FROM "EndpointAuthentications" AS EA
+                                                        JOIN "ClientEndpoint" AS CE
+                                                             ON EA.ce_id = CE.id
+                                               WHERE CE.client_id IN ($1)
                                                  AND EA.created_at BETWEEN $2 AND $3`
 
 // exports.query_endpoint_registry_changes_count = `SELECT SUM(registry) as totalRegistryChangeCount
 //                                                  FROM "EndpointMetrics"
 //                                                  WHERE created_at >= current_date - interval '30' day`
 
-exports.query_endpoint_registry_changes_count = `SELECT SUM(registry) as totalRegistryChangeCount 
-                                                 FROM "EndpointMetrics" AS EM 
-                                                     JOIN "ClientEndpoint" AS CE 
-                                                         ON EM.ce_id=CE.id 
-                                                 WHERE CE.client_id IN ($1) 
+exports.query_endpoint_registry_changes_count = `SELECT SUM(registry) as totalRegistryChangeCount
+                                                 FROM "EndpointMetrics" AS EM
+                                                          JOIN "ClientEndpoint" AS CE
+                                                               ON EM.ce_id = CE.id
+                                                 WHERE CE.client_id IN ($1)
                                                    AND EM.created_at BETWEEN $2 AND $3`
 
 // exports.query_endpoint_service_creation_count = `SELECT SUM(service) as totalServiceCreationCount
 //                                                  FROM "EndpointMetrics"
 //                                                  WHERE created_at >= current_date - interval '30' day`
-exports.query_endpoint_service_creation_count=`SELECT SUM(service) as totalServiceCreationCount
-                                                 FROM "EndpointMetrics" AS EM 
-                                                     JOIN "ClientEndpoint" AS CE 
-                                                         ON EM.ce_id=CE.id 
-                                                 WHERE CE.client_id IN ($1) 
+exports.query_endpoint_service_creation_count = `SELECT SUM(service) as totalServiceCreationCount
+                                                 FROM "EndpointMetrics" AS EM
+                                                          JOIN "ClientEndpoint" AS CE
+                                                               ON EM.ce_id = CE.id
+                                                 WHERE CE.client_id IN ($1)
                                                    AND EM.created_at BETWEEN $2 AND $3`
 
 // exports.query_endpoint_process_creation_count = `SELECT SUM(process) as totalProcessCreationCount
 //                                                  FROM "EndpointMetrics"
 //                                                  WHERE created_at >= current_date - interval '30' day`
 
-exports.query_endpoint_process_creation_count=`SELECT  SUM(process) as totalProcessCreationCount
-                                                 FROM "EndpointMetrics" AS EM 
-                                                     JOIN "ClientEndpoint" AS CE 
-                                                         ON EM.ce_id=CE.id 
-                                                 WHERE CE.client_id IN ($1) 
+exports.query_endpoint_process_creation_count = `SELECT SUM(process) as totalProcessCreationCount
+                                                 FROM "EndpointMetrics" AS EM
+                                                          JOIN "ClientEndpoint" AS CE
+                                                               ON EM.ce_id = CE.id
+                                                 WHERE CE.client_id IN ($1)
                                                    AND EM.created_at BETWEEN $2 AND $3`
 
 // exports.query_endpoint_policy_changes_count = `SELECT SUM(policy) as totalPolicyChangesCount
 //                                                FROM "EndpointMetrics"
 //                                                WHERE created_at >= current_date - interval '30' day`
 
-exports.query_endpoint_policy_changes_count=`SELECT  SUM(policy) as totalPolicyChangesCount
-                                                 FROM "EndpointMetrics" AS EM 
-                                                     JOIN "ClientEndpoint" AS CE 
-                                                         ON EM.ce_id=CE.id 
-                                                 WHERE CE.client_id IN ($1) 
-                                                   AND EM.created_at BETWEEN $2 AND $3`
+exports.query_endpoint_policy_changes_count = `SELECT SUM(policy) as totalPolicyChangesCount
+                                               FROM "EndpointMetrics" AS EM
+                                                        JOIN "ClientEndpoint" AS CE
+                                                             ON EM.ce_id = CE.id
+                                               WHERE CE.client_id IN ($1)
+                                                 AND EM.created_at BETWEEN $2 AND $3`
 
 // exports.query_endpoint_file_creation_count = `SELECT SUM(file) as totalFileCreationCount
 //                                               FROM "EndpointMetrics"
 //                                               WHERE created_at >= current_date - interval '30' day`
 
-exports.query_endpoint_file_creation_count=`SELECT SUM(file) as totalFileCreationCount
-                                                 FROM "EndpointMetrics" AS EM 
-                                                     JOIN "ClientEndpoint" AS CE 
-                                                         ON EM.ce_id=CE.id 
-                                                 WHERE CE.client_id IN ($1) 
-                                                   AND EM.created_at BETWEEN $2 AND $3`
+exports.query_endpoint_file_creation_count = `SELECT SUM(file) as totalFileCreationCount
+                                              FROM "EndpointMetrics" AS EM
+                                                       JOIN "ClientEndpoint" AS CE
+                                                            ON EM.ce_id = CE.id
+                                              WHERE CE.client_id IN ($1)
+                                                AND EM.created_at BETWEEN $2 AND $3`
 
 exports.query_endpoint_most_active_servers = `SELECT ROUND(AVG(active_server), 0) as totalActiveServer
                                               FROM "EndpointAuthentications"
@@ -301,7 +308,7 @@ exports.query_endpoint_total_authentication_count = `SELECT SUM(auth) as totalAu
 exports.query_endpoint_total_failed_authentication_count = `SELECT SUM(failed_auth) as totalFailedAuthentication
                                                             FROM "EndpointAuthentications" AS EA
                                                                      JOIN "ClientEndpoint" AS CE
-                                                                          ON EA.ce_id=CE.id
+                                                                          ON EA.ce_id = CE.id
                                                             WHERE CE.client_id IN ($1)
                                                               AND EA.created_at BETWEEN $2 AND $3`
 
@@ -350,16 +357,16 @@ exports.query_edr_metric = `SELECT SUM(log)        as logCount,
                             WHERE cedr_id IN ($1)
                               AND created_at >= current_date - interval '30' day`
 
-exports.get_query_edr_metric = `SELECT SUM(log)             AS logCount,
-                                       MAX(EDRM.count)      AS edrCount,
-                                       SUM(EDRM.trojan)     AS trojanCount,
-                                       SUM(EDRM.riskware)   AS riskwareCount,
-                                       SUM(EDRM.malware)    AS malwareCount,
-                                       SUM(EDRM.ransomware) AS ransomwareCount,
-                                       SUM(EDRM.phishing)   AS phishingCount,
-                                       SUM(EDRM.url_filter) AS urlFilterCount,
+exports.get_query_edr_metric = `SELECT SUM(log)                    AS logCount,
+                                       MAX(EDRM.count)             AS edrCount,
+                                       SUM(EDRM.trojan)            AS trojanCount,
+                                       SUM(EDRM.riskware)          AS riskwareCount,
+                                       SUM(EDRM.malware)           AS malwareCount,
+                                       SUM(EDRM.ransomware)        AS ransomwareCount,
+                                       SUM(EDRM.phishing)          AS phishingCount,
+                                       SUM(EDRM.url_filter)        AS urlFilterCount,
                                        SUM(EDRM.threat_extraction) AS threatExtractionCount,
-                                       SUM(EDRM.threat_emulation) AS threatEmulationCount
+                                       SUM(EDRM.threat_emulation)  AS threatEmulationCount
                                 FROM "ClientEDR" AS CEDR
                                          JOIN "EDRMetrics" AS EDRM
                                               ON CEDR.id = EDRM.cedr_id
