@@ -7,7 +7,7 @@ const {lazyrouter} = require("express/lib/application");
 //test get all firewall record
 router.get('/getAllFirewallDetails', async(req, res) => {
   try{
-    const result  = await db.query(`SELECT * FROM "FirewallMetrics" WHERE cf_id='3ea9994f-8132-407e-b1ed-691f5526ce28' AND created_at >= current_date - interval '30' day`);
+    const result  = await db.query(apiQueries.query_test,[req.query.customerId,req.query.startDate,req.query.endDate]);
     res.status(200).send(result.rows)
   }
   catch (error){
