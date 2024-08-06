@@ -32,6 +32,15 @@ router.get("/getEDRMetricsData/",async(req,res)=>{
     }
 })
 
+router.get("/getEDRMPermittedMtricsData",async (req,res)=>{
+    try{
+        const result = await db.query(apiQueries.get_query_edr_permitted_metric,[req.query.customerId,req.query.startDate,req.query.endDate])
+        res.status(200).send(result.rows)
+    }catch (error){
+        console.log(error)
+    }
+})
+
 router.get("/getEDRCount",async (req,res)=>{
     try{
         const result = await db.query(apiQueries.query_edr_count,[req.query.customerId, req.query.startDate, req.query.endDate])

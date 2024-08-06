@@ -45,7 +45,8 @@ router.get("/getNACMetrics",async(req,res)=>{
 
 router.get("/getNACLogIngestionCount",async(req,res)=>{
   try{
-    const result = await db.query(apiQueries.query_nac_log_ingestion_count,[req.query.customerId])
+    console.log(req.query)
+    const result = await db.query(apiQueries.query_nac_log_ingestion_count,[req.query.customerId,req.query.startDate,req.query.endDate])
     res.status(200).send(result.rows)
   }
   catch(error){

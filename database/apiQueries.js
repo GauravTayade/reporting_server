@@ -344,7 +344,7 @@ exports.query_nac_log_ingestion_count = `SELECT SUM(log) as logCount
                                                   JOIN "ClientNAC" AS CNAC
                                                        ON NACM.cnac_id = CNAC.id
                                          WHERE client_id IN ($1)
-                                           AND NACM.created_at >= current_date - interval '30' day`
+                                           AND NACM.created_at BETWEEN $2 and $3`
 
 exports.query_edr_metric = `SELECT SUM(log)        as logCount,
                                    SUM(trojan)     as trojanCount,
@@ -372,6 +372,22 @@ exports.get_query_edr_metric = `SELECT SUM(log)                    AS logCount,
                                               ON CEDR.id = EDRM.cedr_id
                                 WHERE client_id IN ($1)
                                   AND EDRM.created_at BETWEEN $2 and $3`
+
+exports.get_query_edr_permitted_metric = `SELECT SUM(log)                    AS logCount,
+                                                 MAX(EDRM.count)             AS edrCount,
+                                                 SUM(EDRM.trojan)            AS trojanCount,
+                                                 SUM(EDRM.riskware)          AS riskwareCount,
+                                                 SUM(EDRM.malware)           AS malwareCount,
+                                                 SUM(EDRM.ransomware)        AS ransomwareCount,
+                                                 SUM(EDRM.phishing)          AS phishingCount,
+                                                 SUM(EDRM.url_filter)        AS urlFilterCount,
+                                                 SUM(EDRM.threat_extraction) AS threatExtractionCount,
+                                                 SUM(EDRM.threat_emulation)  AS threatEmulationCount
+                                         FROM "ClientEDR" AS CEDR
+                                            JOIN "EDRMetrics" AS EDRM
+                                                ON CEDR.id = EDRM.cedr_id
+                                        WHERE client_id IN ($1)
+                                            AND EDRM.created_at BETWEEN $2 and $3`
 
 exports.query_edr_count = `SELECT MAX(EDRM.count) as clientedrcount
                            FROM "EDRMetrics" AS EDRM
