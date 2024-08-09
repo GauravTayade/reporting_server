@@ -187,6 +187,9 @@ exports.query_endpoint_list = `SELECT *
                                FROM "ClientEndpoint"
                                WHERE client_id = $1`
 
+exports.query_endpoint_save_recommendations = `INSERT INTO "Comment"(comment,category,cr_id,employee_id) VALUES ($1,$2,$3,$4)`
+
+exports.query_endpoint_get_recommendations = `SELECT * FROM "Comment" WHERE category=$1 AND cr_id=$2`
 // exports.query_endpoint_most_active_servers_list = `SELECT eas.active_server, SUM(eas.count) as totalcount
 //                                                    FROM "EndpointAuthenticationsActiveServer" as eas
 //                                                    WHERE ce_id = $1
