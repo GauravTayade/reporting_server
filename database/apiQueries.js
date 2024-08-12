@@ -187,6 +187,10 @@ exports.query_endpoint_list = `SELECT *
                                FROM "ClientEndpoint"
                                WHERE client_id = $1`
 
+// exports.query_firewall_save_recommendations = `INSERT INTO "Comment"(comment,category,cr_id,employee_id) VALUES ($1,$2,$3,$4)`
+//
+// exports.query_firewall_get_recommendations = `SELECT * FROM "Comment" WHERE category=$1 AND cr_id=$2`
+
 exports.query_endpoint_save_recommendations = `INSERT INTO "Comment"(comment,category,cr_id,employee_id) VALUES ($1,$2,$3,$4)`
 
 exports.query_endpoint_get_recommendations = `SELECT * FROM "Comment" WHERE category=$1 AND cr_id=$2`

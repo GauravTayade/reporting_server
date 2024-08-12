@@ -3,6 +3,40 @@ var router = express.Router();
 const db = require('../database/db');
 const apiQueries = require("../database/apiQueries");
 
+router.post("/saveRecommendation", async (req,res)=>{
+
+    let output = true
+
+    try{
+        const comments = req.body.endpointRecommendations
+
+        //delete previous commnets
+        db.query(`DELETE FROM "Comment" WHERE cr_id=$1 AND category='endpoint'`,[comments[0].crId])
+
+        comments.forEach(data=>{
+            db.query(apiQueries.query_endpoint_save_recommendations,[data.comment,data.category,data.crId,data.employeeId]).then(result=>{
+                if(result.rowCount<=0)
+                {
+                    output = false
+                }
+            })
+            return false
+        })
+
+        res.status(200).send({output:output})
+    }
+    catch (error){
+        console.log(error)
+    }
+
+})
+
+router.get("/getEndpointRecommendation",async (req,res)=>{
+    db.query(apiQueries.query_endpoint_get_recommendations,[req.query.category,req.query.crId]).then(result=>{
+        res.status(200).send(result.rows)
+    })
+})
+
 router.get("/getEDRMetrics",async(req,res)=>{
     try{
         const result = await db.query(apiQueries.query_edr_metric,'')
@@ -121,6 +155,5 @@ router.get("/getEDRMetric", async (req,res) => {
         console.log(error)
     }
 })
-
 
 module.exports = router;
