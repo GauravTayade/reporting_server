@@ -7,29 +7,33 @@ router.get("/", async (req,res)=>{
   res.status(200).send("if edr works it works")
 })
 
-router.post("/saveRecommendation", async (req,res)=>{
+router.post("/saveRecommendation", async (req, res) => {
 
   let output = true
 
-  try{
+  try {
     const comments = req.body.endpointRecommendations
 
     //delete previous commnets
-    db.query(`DELETE FROM "Comment" WHERE cr_id=$1 AND category='server'`,[comments[0].crId])
+    await db.query(`DELETE
+                    FROM "Comment"
+                    WHERE crc_id = $1
+                      AND category = 'server'`, [comments[0].crId]).then(result => {
+      comments.forEach(data => {
+        db.query(apiQueries.query_endpoint_save_recommendations, [data.comment, data.category, data.crId, data.employeeId]).then(result => {
 
-    comments.forEach(data=>{
-      db.query(apiQueries.query_endpoint_save_recommendations,[data.comment,data.category,data.crId,data.employeeId]).then(result=>{
-        if(result.rowCount<=0)
-        {
-          output = false
-        }
+          if (result.rowCount <= 0) {
+            output = false
+          }
+        })
+        return false
       })
-      return false
+      res.status(200).send({output: output})
     })
-
-    res.status(200).send({output:output})
-  }
-  catch (error){
+      .catch(error => {
+        console.log(error)
+      })
+  } catch (error) {
     console.log(error)
   }
 

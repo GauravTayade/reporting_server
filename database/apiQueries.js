@@ -1,6 +1,83 @@
 const db = require("./db");
+
+//report queries
+//mark report as ready for review
+exports.query_report_ready_for_review = `UPDATE "ClientReportCollection"
+                                         SET is_pending       = false,
+                                             review_requested = true,
+                                             is_reviewed      = false,
+                                             is_delivered     = false
+                                         WHERE id = $1`
+
+//mark report as reviewed
+exports.query_report_reviewed = `UPDATE "ClientReportCollection"
+                                 SET is_pending       = false,
+                                     review_requested = false,
+                                     is_reviewed      = true,
+                                     is_delivered     = false
+                                 WHERE id = $1`
+//mark report as delivered
+exports.query_report_delivered = `UPDATE "ClientReportCollection"
+                                  SET is_pending       = false,
+                                      review_requested = false,
+                                      is_reviewed      = false,
+                                      is_delivered     = true
+                                  WHERE id = $1`
+
 exports.query_get_customer_list = `SELECT *
                                    FROM "Client"`
+
+exports.query_get_customer_report_list = `SELECT CL.id           AS client_id,
+                                                 CR.id           AS report_id,
+                                                 CL.name         AS customer_name,
+                                                 CL.code         AS customer_code,
+                                                 CR.created_at   AS report_date,
+                                                 CR.format       AS report_type,
+                                                 CR.description  AS report_description,
+                                                 CR.is_reviewed  AS report_reviewed,
+                                                 CR.is_delivered AS report_delivered,
+                                                 CR.from         AS start_date,
+                                                 CR.to           AS end_date,
+                                                 R.name          AS report_occurance_name,
+                                                 R.type          AS report_occurance
+                                          FROM "ClientReport" AS CR
+                                                   JOIN "Client" AS CL
+                                                        ON CR.client_id = CL.id
+                                                   JOIN "Report" AS R
+                                                        ON CR.report_id = R.id
+                                          ORDER BY CR.id ASC LIMIT $1
+                                          OFFSET $2`
+
+exports.get_customer_report_details = `SELECT CRC.id               AS report_id,
+                                              CRC.created_at       AS report_date,
+                                              CRC.from             AS report_start_date,
+                                              CRC.to               AS report_end_date,
+                                              CRC.is_pending       AS report_pending,
+                                              CRC.review_requested AS report_review_requested,
+                                              CRC.is_reviewed      AS report_reviewed,
+                                              CRC.is_delivered     AS report_delivered,
+                                              CR.client_id         AS customer_id,
+                                              CL.code              AS customer_code,
+                                              CL.name              AS customer_name
+                                       FROM "ClientReportCollection" AS CRC
+                                                JOIN "ClientReport" AS CR
+                                                     ON CRC.cr_id = CR.id
+                                                JOIN "Client" AS CL
+                                                     ON CR.client_id = CL.id
+                                       WHERE CRC.id = $1`
+
+exports.get_customer_report_status_details = `SELECT CRC.is_pending       AS report_pending,
+                                                     CRC.review_requested AS report_review_requested,
+                                                     CRC.is_reviewed      AS report_reviewed,
+                                                     CRC.is_delivered     AS report_delivered
+                                              FROM "ClientReportCollection" AS CRC
+                                                JOIN "ClientReport" AS CR
+                                                    ON CRC.cr_id = CR.id
+                                                JOIN "Client" AS CL
+                                                     ON CR.client_id = CL.id
+                                              WHERE CRC.id = $1`
+
+exports.query_get_customer_details = `SELECT * FROM "Client" AS Cl WHERE Cl.code=$1`
 
 //test
 exports.query_test = `SELECT *
@@ -100,6 +177,7 @@ exports.query_firewall_count_total = `SELECT COUNT(*) as clientFirewallCount
 exports.query_get_firewall_list_for_customer = `SELECT *
                                                 FROM "ClientFirewall"
                                                 WHERE client_id = $1`
+
 //to get count of logs for all firewalls
 exports.query_firewall_log_count_all = `SELECT SUM(log) as logcount
                                         FROM "FirewallMetrics" AS FM
@@ -187,19 +265,9 @@ exports.query_endpoint_list = `SELECT *
                                FROM "ClientEndpoint"
                                WHERE client_id = $1`
 
-// exports.query_firewall_save_recommendations = `INSERT INTO "Comment"(comment,category,cr_id,employee_id) VALUES ($1,$2,$3,$4)`
-//
-// exports.query_firewall_get_recommendations = `SELECT * FROM "Comment" WHERE category=$1 AND cr_id=$2`
+exports.query_endpoint_save_recommendations = `INSERT INTO "Comment"(comment,category,crc_id,employee_id) VALUES ($1,$2,$3,$4)`
 
-exports.query_endpoint_save_recommendations = `INSERT INTO "Comment"(comment,category,cr_id,employee_id) VALUES ($1,$2,$3,$4)`
-
-exports.query_endpoint_get_recommendations = `SELECT * FROM "Comment" WHERE category=$1 AND cr_id=$2`
-// exports.query_endpoint_most_active_servers_list = `SELECT eas.active_server, SUM(eas.count) as totalcount
-//                                                    FROM "EndpointAuthenticationsActiveServer" as eas
-//                                                    WHERE ce_id = $1
-//                                                      AND created_at >= current_date - interval '30' day
-//                                                    GROUP BY eas.active_server
-//                                                    ORDER BY totalcount DESC LIMIT 5`
+exports.query_endpoint_get_recommendations = `SELECT * FROM "Comment" WHERE category=$1 AND crc_id=$2`
 
 exports.query_endpoint_most_active_servers_list = `SELECT EAS.active_server,
                                                           SUM(EAS.count) as totalcount
@@ -235,21 +303,12 @@ exports.query_endpoint_log_ingestion_count = `SELECT SUM(log) as logCount
                                               WHERE client_id IN ($1)
                                                 AND EM.created_at BETWEEN $2 AND $3`
 
-// exports.query_endpoint_authentication_count = `SELECT SUM(auth) as totalAuthenticationCount
-//                                                FROM "EndpointAuthentications"
-//                                                WHERE ce_id = $1
-//                                                  AND created_at >= current_date - interval '30' day`
-
 exports.query_endpoint_authentication_count = `SELECT SUM(auth) as totalAuthenticationCount
                                                FROM "EndpointAuthentications" AS EA
                                                         JOIN "ClientEndpoint" AS CE
                                                              ON EA.ce_id = CE.id
                                                WHERE CE.client_id IN ($1)
                                                  AND EA.created_at BETWEEN $2 AND $3`
-
-// exports.query_endpoint_registry_changes_count = `SELECT SUM(registry) as totalRegistryChangeCount
-//                                                  FROM "EndpointMetrics"
-//                                                  WHERE created_at >= current_date - interval '30' day`
 
 exports.query_endpoint_registry_changes_count = `SELECT SUM(registry) as totalRegistryChangeCount
                                                  FROM "EndpointMetrics" AS EM
@@ -258,19 +317,12 @@ exports.query_endpoint_registry_changes_count = `SELECT SUM(registry) as totalRe
                                                  WHERE CE.client_id IN ($1)
                                                    AND EM.created_at BETWEEN $2 AND $3`
 
-// exports.query_endpoint_service_creation_count = `SELECT SUM(service) as totalServiceCreationCount
-//                                                  FROM "EndpointMetrics"
-//                                                  WHERE created_at >= current_date - interval '30' day`
 exports.query_endpoint_service_creation_count = `SELECT SUM(service) as totalServiceCreationCount
                                                  FROM "EndpointMetrics" AS EM
                                                           JOIN "ClientEndpoint" AS CE
                                                                ON EM.ce_id = CE.id
                                                  WHERE CE.client_id IN ($1)
                                                    AND EM.created_at BETWEEN $2 AND $3`
-
-// exports.query_endpoint_process_creation_count = `SELECT SUM(process) as totalProcessCreationCount
-//                                                  FROM "EndpointMetrics"
-//                                                  WHERE created_at >= current_date - interval '30' day`
 
 exports.query_endpoint_process_creation_count = `SELECT SUM(process) as totalProcessCreationCount
                                                  FROM "EndpointMetrics" AS EM
@@ -279,20 +331,12 @@ exports.query_endpoint_process_creation_count = `SELECT SUM(process) as totalPro
                                                  WHERE CE.client_id IN ($1)
                                                    AND EM.created_at BETWEEN $2 AND $3`
 
-// exports.query_endpoint_policy_changes_count = `SELECT SUM(policy) as totalPolicyChangesCount
-//                                                FROM "EndpointMetrics"
-//                                                WHERE created_at >= current_date - interval '30' day`
-
 exports.query_endpoint_policy_changes_count = `SELECT SUM(policy) as totalPolicyChangesCount
                                                FROM "EndpointMetrics" AS EM
                                                         JOIN "ClientEndpoint" AS CE
                                                              ON EM.ce_id = CE.id
                                                WHERE CE.client_id IN ($1)
                                                  AND EM.created_at BETWEEN $2 AND $3`
-
-// exports.query_endpoint_file_creation_count = `SELECT SUM(file) as totalFileCreationCount
-//                                               FROM "EndpointMetrics"
-//                                               WHERE created_at >= current_date - interval '30' day`
 
 exports.query_endpoint_file_creation_count = `SELECT SUM(file) as totalFileCreationCount
                                               FROM "EndpointMetrics" AS EM
@@ -309,9 +353,6 @@ exports.query_endpoint_total_authentication_count = `SELECT SUM(auth) as totalAu
                                                      FROM "EndpointAuthentications"
                                                      WHERE created_at >= current_date - interval '30' day`
 
-// exports.query_endpoint_total_failed_authentication_count = `SELECT SUM(failed_auth) as totalFailedAuthentication
-//                                                             FROM "EndpointAuthentications"
-//                                                             WHERE created_at >= current_date - interval '30' day`
 exports.query_endpoint_total_failed_authentication_count = `SELECT SUM(failed_auth) as totalFailedAuthentication
                                                             FROM "EndpointAuthentications" AS EA
                                                                      JOIN "ClientEndpoint" AS CE

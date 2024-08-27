@@ -3,35 +3,42 @@ var router = express.Router();
 const db = require('../database/db');
 const apiQueries = require("../database/apiQueries");
 
-router.post("/saveRecommendation", async (req,res)=>{
+router.post("/saveRecommendation", async (req, res) => {
 
     let output = true
 
-    try{
+    try {
         const comments = req.body.endpointRecommendations
 
         //delete previous commnets
-        db.query(`DELETE FROM "Comment" WHERE cr_id=$1 AND category='endpoint'`,[comments[0].crId])
+        db.query(`DELETE
+                  FROM "Comment"
+                  WHERE crc_id = $1
+                    AND category = 'endpoint'`, [comments[0].crId])
+          .then(result => {
+              comments.forEach(data => {
+                  db.query(apiQueries.query_endpoint_save_recommendations, [data.comment, data.category, data.crId, data.employeeId]).then(result => {
+                      if (result.rowCount <= 0) {
+                          output = false
+                      }
+                  })
+                  return false
+              })
 
-        comments.forEach(data=>{
-            db.query(apiQueries.query_endpoint_save_recommendations,[data.comment,data.category,data.crId,data.employeeId]).then(result=>{
-                if(result.rowCount<=0)
-                {
-                    output = false
-                }
-            })
-            return false
-        })
-
-        res.status(200).send({output:output})
-    }
-    catch (error){
+              res.status(200).send({output: output})
+          })
+          .catch(error => {
+              console.log(error)
+          })
+    } catch (error) {
         console.log(error)
     }
 
 })
 
 router.get("/getEndpointRecommendation",async (req,res)=>{
+
+
     db.query(apiQueries.query_endpoint_get_recommendations,[req.query.category,req.query.crId]).then(result=>{
         res.status(200).send(result.rows)
     })

@@ -15,33 +15,35 @@ router.get('/getAllFirewallDetails', async(req, res) => {
   }
 })
 
-
-router.post("/saveRecommendation", async (req,res)=>{
+router.post("/saveRecommendation", async (req, res) => {
 
   let output = true
 
-  try{
+  try {
     const comments = req.body.gatewayRecommendation
 
     //delete previous commnets
-    db.query(`DELETE FROM "Comment" WHERE cr_id=$1 AND category='gateway'`,[comments[0].crId])
-
-    comments.forEach(data=>{
-      db.query(apiQueries.query_endpoint_save_recommendations,[data.comment,data.category,data.crId,data.employeeId]).then(result=>{
-        if(result.rowCount<=0)
-        {
-          output = false
-        }
+    db.query(`DELETE
+              FROM "Comment"
+              WHERE crc_id = $1
+                AND category = 'gateway'`, [comments[0].crId])
+      .then(result => {
+        comments.forEach(data => {
+          db.query(apiQueries.query_endpoint_save_recommendations, [data.comment, data.category, data.crId, data.employeeId]).then(result => {
+            if (result.rowCount <= 0) {
+              output = false
+            }
+          })
+          return false
+        })
+        res.status(200).send({output: output})
       })
-      return false
-    })
-
-    res.status(200).send({output:output})
-  }
-  catch (error){
+      .catch(error => {
+        console.log(error)
+      })
+  } catch (error) {
     console.log(error)
   }
-
 })
 
 router.get("/getFirewallCount",async (req,res)=>{
@@ -206,6 +208,7 @@ router.get("/getFirewallTopNetworkProtocols",async (req,res)=>{
     console.log(error)
   }
 })
+
 router.get("/getFirewallTopNetworkRules",async (req,res)=>{
   try{
     const result = await db.query(apiQueries.query_firewall_top_network_rule,[req.query.firewallId])
