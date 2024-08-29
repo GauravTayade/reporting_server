@@ -159,12 +159,24 @@ exports.query_VAScan_data_source_details = `SELECT V.code    AS vendor,
                                               AND VAM.created_at BETWEEN $2 AND $3
                                             GROUP BY CVA.id, V.id`
 
+//get the IPS Hits Analysis for now then ES
+exports.query_get_firewall_IPS_hists_analysis = `SELECT DISTINCT(attack), count(attack) AS attackCount, src, dest
+                                                 FROM "FirewallAttacks"
+                                                 WHERE cf_id IN ($1)
+                                                   AND created_at >= $2
+                                                   AND created_at <= $3
+                                                   AND src NOT LIKE '192.%'
+                                                   AND src NOT LIKE '10.%'
+                                                 GROUP BY attack, src, dest
+                                                 ORDER BY attackCount DESC
+                                                 LIMIT 10`
+
 //get the top external threats count
 exports.query_get_top_extenal_threats = `SELECT te.ip,
                                                 sum(te.count) as hitsCount
                                          FROM "ThreatsExternal" as te
                                          WHERE client_id = $1
-                                           AND te.created_at >= current_date - interval '30' day
+                                           AND te.created_at >= $2 AND te.created_at <= $3
                                          GROUP BY te.ip
                                          ORDER BY hitsCount DESC LIMIT 5`
 

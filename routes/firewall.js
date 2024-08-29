@@ -168,6 +168,17 @@ router.get("/getFirewallTotalIPSHitsCount",async (req,res)=>{
   }
 })
 
+//temp IPS hits analysis
+router.get("/getFirewallIPSHitsAnalysis",async(req,res)=>{
+  try{
+    const result = await db.query(apiQueries.query_get_firewall_IPS_hists_analysis,[req.query.firewallList,req.query.startDate, req.query.endDate])
+    res.status(200).send(result.rows)
+  }
+  catch (error) {
+    res.status(200).send(error)
+  }
+})
+
 router.get("/getFirewallTotalSourceIPSCount",async (req,res)=>{
   try{
     const result = await db.query(apiQueries.query_firewall_total_source_ips_count,[req.query.customerId])
@@ -221,7 +232,7 @@ router.get("/getFirewallTopNetworkRules",async (req,res)=>{
 
 router.get("/getTopExternalThreat",async(req,res)=>{
   try {
-    const result = await db.query(apiQueries.query_get_top_extenal_threats,[req.query.customerId])
+    const result = await db.query(apiQueries.query_get_top_extenal_threats,[req.query.customerId,req.query.startDate,req.query.endDate])
     res.status(200).send(result.rows)
   }
   catch (error){

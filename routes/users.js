@@ -136,5 +136,15 @@ router.get("/reportStatus",async(req,res)=>{
   }
 })
 
+//register user
+router.post("/saveUser",async (req,res)=>{
+  // try{
+  //   const result = await db.query(apiQueries.save_user_details,[])
+  // }
+  // catch(error){
+  //   console.log(error)
+  // }
+})
+
 
 module.exports = router;
