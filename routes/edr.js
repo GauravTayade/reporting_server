@@ -28,20 +28,23 @@ router.post("/saveRecommendation", async (req, res) => {
               res.status(200).send({output: output})
           })
           .catch(error => {
-              console.log(error)
+              res.status(500).send(error)
           })
     } catch (error) {
-        console.log(error)
+        res.status(500).send(error)
     }
 
 })
 
 router.get("/getEndpointRecommendation",async (req,res)=>{
-
-
-    db.query(apiQueries.query_endpoint_get_recommendations,[req.query.category,req.query.crId]).then(result=>{
-        res.status(200).send(result.rows)
-    })
+    try{
+        db.query(apiQueries.query_endpoint_get_recommendations,[req.query.category,req.query.crId]).then(result=>{
+            res.status(200).send(result.rows)
+        })
+    }
+    catch (error){
+        res.status(500).send(error)
+    }
 })
 
 router.get("/getEDRMetrics",async(req,res)=>{
@@ -49,7 +52,7 @@ router.get("/getEDRMetrics",async(req,res)=>{
         const result = await db.query(apiQueries.query_edr_metric,'')
         res.status(200).send(result.rows)
     }catch(error){
-        console.log(error)
+        res.status(500).send(error)
     }
 })
 
@@ -59,7 +62,7 @@ router.get("/getEDRDataSourceDetails",async (req,res)=>{
         res.status(200).send(result.rows)
     }
     catch (error){
-        console.log(error)
+        res.status(500).send(error)
     }
 })
 
@@ -69,7 +72,7 @@ router.get("/getEDRMetricsData/",async(req,res)=>{
         res.status(200).send(result.rows)
     }
     catch (error){
-        console.log(error)
+        res.status(500).send(error)
     }
 })
 
@@ -78,7 +81,7 @@ router.get("/getEDRMPermittedMtricsData",async (req,res)=>{
         const result = await db.query(apiQueries.get_query_edr_permitted_metric,[req.query.customerId,req.query.startDate,req.query.endDate])
         res.status(200).send(result.rows)
     }catch (error){
-        console.log(error)
+        res.status(500).send(error)
     }
 })
 
@@ -87,7 +90,7 @@ router.get("/getEDRCount",async (req,res)=>{
         const result = await db.query(apiQueries.query_edr_count,[req.query.customerId, req.query.startDate, req.query.endDate])
         res.status(200).send(result.rows)
     }catch(error){
-        console.log(error)
+        res.status(500).send(error)
     }
 })
 
@@ -96,7 +99,7 @@ router.get("/getEDRLogcount", async (req,res)=>{
         const result = await db.query(apiQueries.query_edr_log_count,[req.query.customerId,req.query.startDate,req.query.endDate])
         res.status(200).send(result.rows)
     }catch(error){
-        console.log(error)
+        res.status(500).send(error)
     }
 })
 
@@ -105,7 +108,7 @@ router.get("/getEDRTrojanCount",async(req,res)=>{
         const result = await db.query(apiQueries.query_edr_trojan_count,'')
         res.status(200).send(result.rows)
     }catch(error){
-        console.log(error)
+        res.status(500).send(error)
     }
 })
 
@@ -114,7 +117,7 @@ router.get("/getEDRRiskwareCount",async(req,res)=>{
         const result = await db.query(apiQueries.query_edr_riskware_count,'')
         res.status(200).send(result.rows)
     }catch(error){
-        console.log(error)
+        res.status(500).send(error)
     }
 })
 
@@ -123,7 +126,7 @@ router.get("/getEDRMalwareCount",async(req,res)=>{
         const result = await db.query(apiQueries.query_edr_malware_count,'')
         res.status(200).send(result.rows)
     }catch(error){
-        console.log(error)
+        res.status(500).send(error)
     }
 })
 
@@ -132,7 +135,7 @@ router.get("/getEDRRansomwareCount",async(req,res)=>{
         const result = await db.query(apiQueries.query_edr_ransomware_count,'')
         res.status(200).send(result.rows)
     }catch(error){
-        console.log(error)
+        res.status(500).send(error)
     }
 })
 
@@ -141,7 +144,7 @@ router.get("/getEDRPhishingCount",async(req,res)=>{
         const result = await db.query(apiQueries.query_edr_phishing_count,'')
         res.status(200).send(result.rows)
     }catch(error){
-        console.log(error)
+        res.status(500).send(error)
     }
 })
 
@@ -150,7 +153,7 @@ router.get("/getEDRURLFilterCount",async(req,res)=>{
         const result = await db.query(apiQueries.query_edr_url_filter_count,'')
         res.status(200).send(result.rows)
     }catch(error){
-        console.log(error)
+        res.status(500).send(error)
     }
 })
 
@@ -159,7 +162,7 @@ router.get("/getEDRMetric", async (req,res) => {
         const result = await db.query(apiQueries.query_edr_metric,'')
         res.status(200).send(result.rows)
     }catch (error){
-        console.log(error)
+        res.status(500).send(error)
     }
 })
 

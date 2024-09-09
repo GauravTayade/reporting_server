@@ -8,8 +8,8 @@ router.get("/getNACCount",async(req,res)=>{
     const result = await db.query(apiQueries.query_nac_count,[req.query.customerId,req.query.startDate, req.query.endDate]);
     res.status(200).send(result.rows)
   }
-  catch(err){
-    console.log(err)
+  catch(error){
+    res.status(500).send(error)
   }
 })
 
@@ -19,38 +19,37 @@ router.get("/getNACDataSourceDetails",async (req,res)=>{
     res.status(200).send(result.rows)
   }
   catch(error){
-    console.log(error)
+   res.status(500).send(error)
   }
 })
-//check
+
 router.get("/getClientNAC",async(req,res)=>{
   try{
     const result = await db.query(apiQueries.query_nac_metrics,'')
     res.status(200).send(result.rows)
   }
   catch(error){
-    console.log(error)
+   res.status(500).send(error)
   }
 })
-//check
+
 router.get("/getNACMetrics",async(req,res)=>{
   try{
     const result = await db.query(apiQueries.query_nac_metrics,'')
     res.status(200).send(result.rows)
   }
   catch(error){
-    console.log(error)
+   res.status(500).send(error)
   }
 })
 
 router.get("/getNACLogIngestionCount",async(req,res)=>{
   try{
-    console.log(req.query)
     const result = await db.query(apiQueries.query_nac_log_ingestion_count,[req.query.customerId,req.query.startDate,req.query.endDate])
     res.status(200).send(result.rows)
   }
   catch(error){
-    console.log(error)
+    res.status(500).send(error)
   }
 })
 

@@ -11,7 +11,7 @@ router.get('/getAllFirewallDetails', async(req, res) => {
     res.status(200).send(result.rows)
   }
   catch (error){
-    console.log(error)
+    res.status(500).send(error)
   }
 })
 
@@ -39,10 +39,10 @@ router.post("/saveRecommendation", async (req, res) => {
         res.status(200).send({output: output})
       })
       .catch(error => {
-        console.log(error)
+        res.status(500).send(error)
       })
   } catch (error) {
-    console.log(error)
+    res.status(500).send(error)
   }
 })
 
@@ -52,7 +52,7 @@ router.get("/getFirewallCount",async (req,res)=>{
     res.status(200).send(result.rows)
   }
   catch(error){
-   res.status(200).send(error)
+    res.status(500).send(error)
   }
 })
 
@@ -62,7 +62,7 @@ router.get("/getFirewallDataSourceDetails",async (req,res)=>{
     res.status(200).send(result.rows)
   }
   catch (error){
-    console.log(error)
+    res.status(500).send(error)
   }
 })
 
@@ -73,7 +73,7 @@ router.get("/getClientFirewallList",async (req,res)=>{
     res.status(200).send(result.rows)
   }
   catch (error){
-    res.status(200).send(error)
+    res.status(500).send(error)
   }
 })
 
@@ -83,7 +83,7 @@ router.get("/getFirewallTotalLogCount",async (req,res)=>{
     res.status(200).send(result.rows)
   }
   catch(error){
-   res.status(200).send(error)
+    res.status(500).send(error)
   }
 })
 
@@ -93,7 +93,7 @@ router.get("/getFirewallAdminActivitiesLogCount",async (req,res)=>{
     res.status(200).send(result.rows)
   }
   catch(error){
-   res.status(200).send(error)
+    res.status(500).send(error)
   }
 })
 
@@ -103,7 +103,7 @@ router.get("/getFirewallActiveBladeCount",async (req,res)=>{
     res.status(200).send(result.rows)
   }
   catch(error){
-   res.status(200).send(error)
+    res.status(500).send(error)
   }
 })
 
@@ -113,7 +113,7 @@ router.get("/getFirewallMetrics",async (req,res)=>{
     res.status(200).send(result.rows)
   }
   catch(error){
-   res.status(200).send(error)
+    res.status(500).send(error)
   }
 })
 
@@ -123,7 +123,7 @@ router.get("/getFirewallAllowedDeniedIPSTrafficCount",async (req,res)=>{
     res.status(200).send(result.rows)
   }
   catch(error){
-   res.status(200).send(error)
+    res.status(500).send(error)
   }
 })
 
@@ -134,7 +134,7 @@ router.get("/getFirewallAllowedTrafficCount",async (req,res)=>{
 
   }
   catch(error){
-   res.status(200).send(error)
+    res.status(500).send(error)
   }
 })
 
@@ -144,7 +144,7 @@ router.get("/getFirewallDeniedTrafficCount",async (req,res)=>{
     res.status(200).send(result.rows)
   }
   catch(error){
-   res.status(200).send(error)
+    res.status(500).send(error)
   }
 })
 
@@ -154,7 +154,7 @@ router.get("/getFirewallIPSTrafficCount",async (req,res)=>{
     res.status(200).send(result.rows)
   }
   catch(error){
-   res.status(200).send(error)
+    res.status(500).send(error)
   }
 })
 
@@ -164,7 +164,7 @@ router.get("/getFirewallTotalIPSHitsCount",async (req,res)=>{
     res.status(200).send(result.rows)
   }
   catch(error){
-   res.status(200).send(error)
+    res.status(500).send(error)
   }
 })
 
@@ -175,7 +175,7 @@ router.get("/getFirewallIPSHitsAnalysis",async(req,res)=>{
     res.status(200).send(result.rows)
   }
   catch (error) {
-    res.status(200).send(error)
+    res.status(500).send(error)
   }
 })
 
@@ -185,7 +185,7 @@ router.get("/getFirewallTotalSourceIPSCount",async (req,res)=>{
     res.status(200).send(result.rows)
   }
   catch(error){
-   res.status(200).send(error)
+    res.status(500).send(error)
   }
 })
 
@@ -195,7 +195,7 @@ router.get("/getFirewallTotalDestinationIPSCount",async (req,res)=>{
     res.status(200).send(result.rows)
   }
   catch(error){
-   res.status(200).send(error)
+    res.status(500).send(error)
   }
 })
 
@@ -205,18 +205,17 @@ router.get("/getFirewallTotalNetworkProtocol",async (req,res)=>{
     res.status(200).send(result.rows)
   }
   catch(error){
-   res.status(200).send(error)
+    res.status(500).send(error)
   }
 })
 
 router.get("/getFirewallTopNetworkProtocols",async (req,res)=>{
   try{
-    console.log(req.query)
     const result = await db.query(apiQueries.query_firewall_top_network_protocol,[req.query.firewallId])
     res.status(200).send(result.rows)
   }
   catch(error){
-    console.log(error)
+    res.status(500).send(error)
   }
 })
 
@@ -226,7 +225,7 @@ router.get("/getFirewallTopNetworkRules",async (req,res)=>{
     res.status(200).send(result.rows)
   }
   catch(error){
-    console.log(error)
+    res.status(500).send(error)
   }
 })
 
@@ -236,7 +235,28 @@ router.get("/getTopExternalThreat",async(req,res)=>{
     res.status(200).send(result.rows)
   }
   catch (error){
-    res.status(200).send(error)
+    res.status(500).send(error)
+  }
+})
+
+router.get("/getUniqueSourceCountriesCount", async(req,res)=>{
+  try{
+    console.log(req.query)
+    const result  = await db.query(apiQueries.query_global_traffic_unique_src_countries,[req.query.cf_id,req.query.startDate, req.query.endDate])
+    res.status(200).send(result.rows)
+  }
+  catch (error) {
+    res.status(500).send(error)
+  }
+})
+
+router.get("/getUniqueDestinationCountriesCount", async(req,res)=>{
+  try{
+    const result  = await db.query(apiQueries.query_global_traffic_unique_dest_countries,[req.query.cf_id,req.query.startDate, req.query.endDate])
+    res.status(200).send(result.rows)
+  }
+  catch (error) {
+    res.status(500).send(error)
   }
 })
 

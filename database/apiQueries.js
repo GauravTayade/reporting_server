@@ -1,6 +1,20 @@
 const db = require("./db");
 
 //report queries
+
+//query to save user
+exports.save_user_details = `INSERT INTO "Employee" ("fname","lname","email","department","password") VALUES ($1,$2,$3,$4,$5)`
+
+//query to user login
+exports.validate_user = `SELECT * FROM "Employee" WHERE email = $1`
+
+//get users from database
+exports.query_get_users_list = `SELECT * FROM "Employee"`
+
+//get a user from database
+exports.query_get_user_details = `SELECT * FROM "Employee" WHERE id= $1`
+
+
 //mark report as ready for review
 exports.query_report_ready_for_review = `UPDATE "ClientReportCollection"
                                          SET is_pending       = false,
@@ -85,11 +99,32 @@ exports.query_test = `SELECT *
                        WHERE cf_id = $1
                          AND created_at BETWEEN  $2 AND $3`
 
+//get source country count for Global Traffic Analysis
+exports.query_global_traffic_unique_src_countries = `SELECT COUNT(DISTINCT (FGC.country))
+                                                     FROM "FirewallGeoCountry" AS FGC
+                                                     where FGC.cf_id IN ($1)
+                                                       AND FGC.created_at >= $2
+                                                       AND FGC.created_at <= $3
+                                                       AND FGC.direction = 'src'`
+
+//get destination country count for Global Traffic Analysis
+exports.query_global_traffic_unique_dest_countries = `SELECT COUNT(DISTINCT (FGC.country))
+                                                      FROM "FirewallGeoCountry" AS FGC
+                                                      where FGC.cf_id IN ($1) 
+                                                        AND FGC.created_at >= $2
+                                                        AND FGC.created_at <= $3
+                                                        AND FGC.direction = 'dest'`
+
+//get source continent traffic for Global Traffic Analysis
+
+//get destination continent traffic for Global Traffic Analysis
+
 //to get firewall datasource details
+//COUNT(DISTINCT (CF.id)) AS firewallCount,
 exports.query_customer_firewall_data_source_details = `SELECT F.name                  AS vendor,
                                                               CF.id                   AS clientFirewallId,
                                                               CF.firewall_id          AS firewallId,
-                                                              COUNT(DISTINCT (CF.id)) AS firewallCount,
+                                                              MAX(FM.count)           AS firewallCount,
                                                               SUM(FM.log)             AS totalLogs
                                                        FROM "ClientFirewall" as CF
                                                                 JOIN "Firewall" as F
@@ -181,9 +216,12 @@ exports.query_get_top_extenal_threats = `SELECT te.ip,
                                          ORDER BY hitsCount DESC LIMIT 5`
 
 //get the count of all firewalls for customer
-exports.query_firewall_count_total = `SELECT COUNT(*) as clientFirewallCount
-                                      FROM "ClientFirewall"
-                                      WHERE client_id = $1`
+// exports.query_firewall_count_total = `SELECT COUNT(*) as clientFirewallCount FROM "ClientFirewall" WHERE client_id = $1`
+
+exports.query_firewall_count_total = `SELECT MAX(FM.count) AS clientfirewallcount
+                                      FROM "ClientFirewall" AS CF
+                                               JOIN "FirewallMetrics" AS FM ON CF.id = FM.cf_id
+                                      WHERE CF.client_id = $1`
 
 //get the list of all firewalls for a customer
 exports.query_get_firewall_list_for_customer = `SELECT *

@@ -3,6 +3,7 @@ const db = require("../database/db");
 const apiQueries = require("../database/apiQueries");
 const {response} = require("express");
 var router = express.Router();
+const bcrypt = require("bcrypt");
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
@@ -15,7 +16,7 @@ router.get('/getCustomerList',async (req,res)=>{
     res.status(200).send(result.rows)
   }
   catch(error){
-    res.status(200).send(error)
+    res.status(500).send(error)
   }
 })
 
@@ -25,7 +26,7 @@ router.get('/getCustomer',async (req,res)=>{
     res.status(200).send(result.rows)
   }
   catch(error){
-    res.status(200).send({error:error})
+    res.status(500).send(error)
   }
 })
 
@@ -35,7 +36,7 @@ router.get ('/getCustomerReportDetails',async(req,res)=>{
     res.status(200).send(result.rows)
   }
   catch(error){
-    console.log(error)
+    res.status(500).send(error)
   }
 })
 
@@ -92,7 +93,7 @@ router.get("/getCustomerReports", async (req,res)=>{
     res.status(200).send(result.rows)
   }
   catch(error){
-    res.status(200).send(error)
+    res.status(500).send(error)
   }
 })
 
@@ -102,7 +103,7 @@ router.post("/reportReadyReview",async(req,res)=>{
     const result = await db.query(apiQueries.query_report_ready_for_review,[req.body.report_id])
     res.status(200).send(result)
   }catch (error){
-    console.log(error)
+    res.status(500).send(error)
   }
 })
 
@@ -112,7 +113,7 @@ router.post("/reportReviewed",async(req,res)=>{
     const result = await db.query(apiQueries.query_report_reviewed,[req.body.report_id])
     res.status(200).send(result)
   }catch (error){
-    console.log(error)
+    res.status(500).send(error)
   }
 })
 
@@ -122,7 +123,7 @@ router.post("/reportDelivered",async(req,res)=>{
     const result = await db.query(apiQueries.query_report_delivered,[req.body.report_id])
     res.status(200).send(result)
   }catch (error){
-    console.log(error)
+    res.status(500).send(error)
   }
 })
 
@@ -132,20 +133,48 @@ router.get("/reportStatus",async(req,res)=>{
     res.status(200).send(result.rows)
   }
   catch(error){
-    console.log(error)
+    res.status(500).send(error)
   }
 })
 // new comment
 
 //register user
 router.post("/saveUser",async (req,res)=>{
-  // try{
-  //   const result = await db.query(apiQueries.save_user_details,[])
-  // }
-  // catch(error){
-  //   console.log(error)
-  // }
+  try{
+    const hashedPassword =  await bcrypt.hash(req.body.user.password,10)
+    const result = await db.query(apiQueries.save_user_details,[req.body.user.fname, req.body.user.lname, req.body.user.email,req.body.user.dept,hashedPassword])
+    if(result.rowCount === 1){
+      res.status(200).send(result)
+    }else{
+      res.status(500).send(result)
+    }
+  }
+  catch (error){
+    console.log(error)
+  }
+
 })
 
+//validate user login
+router.post("/validate",async(req,res)=>{
+  try{
+    const result = await db.query(apiQueries.validate_user,[req.body.username])
+    res.status(200).send(result)
+  }
+  catch(error){
+    res.status(500).send(error)
+  }
+})
+
+//get users list
+router.get("/getUsers",async(req,res)=>{
+  try{
+    const result = await db.query(apiQueries.query_get_users_list)
+    res.status(200).send(result)
+  }
+  catch (error){
+    res.status(500).send(error)
+  }
+})
 
 module.exports = router;
